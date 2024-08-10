@@ -1,10 +1,12 @@
 import fileinput
 from collections import defaultdict
+from pprint import pprint
 
 PUZZLE = [line.strip() for line in fileinput.input()]
 BOTTOM = ''
 
 D = defaultdict(dict)
+C = defaultdict(dict)
 
 def recursive_circus(data):
     global BOTTOM
@@ -16,6 +18,30 @@ def recursive_circus(data):
     for key, value in D.items():
         if 'parent' not in value:
             BOTTOM = key
+    root = BOTTOM
+    unbalanced_node(root, D)
+
+
+
+def unbalanced_node(node, tree):
+    total_weight = int(D[node]['weight'])
+    C = defaultdict(dict)
+
+    for child in D[node]['children']:
+        child_weight = unbalanced_node(child, tree)
+        C[node][child] = child_weight
+        total_weight += int(child_weight)
+
+    for key, weights in C.items():
+        unique_weights = set(weights.values())
+        if len(unique_weights) > 1:
+            print(key, weights)
+            for item in weights:
+                print(item, D[item]['weight'])
+    return total_weight
+
+        
+
 
 def add_parents(graph):
     for parent, values in graph.items():
